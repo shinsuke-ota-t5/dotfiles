@@ -1,0 +1,49 @@
+#!/usr/bin/zsh
+
+# ROOT
+
+pushd /usr/local/root/6.20.06 && . bin/thisroot.sh && popd > /dev/null
+
+# mpi
+
+export PATH=/saho/sharedAPL/local/gnu/openmpi/64bit/bin:$PATH
+export LD_LIBRARY_PATH=/saho/sharedAPL/local/gnu/openmpi/64bit/lib:$LD_LIBRARY_PATH
+
+# artemis
+export PATH=$HOME/local/bin:$PATH
+export LD_LIBRARY_PATH=$HOME/local/lib:$LD_LIBRARY_PATH
+
+unalias e
+vncdisplay=.vncdisplay
+
+function a()
+{
+    if [ -f $vncdisplay ] ; then
+        DISPLAY=:`cat $vncdisplay` artemis -l $*
+    else
+        artemis -l $*
+    fi
+}
+
+function artlogin-ribf113()
+{
+    export ART_ANALYSIS_DIR=$HOME/art_analysis #: the directory for analysis (ex. art_$
+    export ART_USER_REPOS=gitlab@gitlab.cns.s.u-tokyo.ac.jp:ota/artemis-ribf113.git
+    export ART_DATA_DIR=/np1a/ # data directory
+    export ART_SHARE_DIR=${ART_ANALYSIS_DIR}/share # data directory
+    . $ART_ANALYSIS_DIR/.artlogin.sh ribf113
+}
+
+
+
+function e(){
+    echo "[$0] emacsclient -c -t $*";
+    (emacsclient -c -t $* ||
+        (echo "[$0] emacs --daemon"; emacs --daemon &&
+            (echo "[$0] emacsclient -c -t $*"; emacsclient -c -t $*)) ||
+        (echo "[$0] emacs $*"; emacs $*))
+}
+
+# aliases
+alias show_quota_ota="lfs quota -ph 51754 /home/ota"
+alias show_quota_phanes="lfs quota -ph 140 /np1a/phanes"
